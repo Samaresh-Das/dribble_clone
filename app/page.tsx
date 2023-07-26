@@ -7,7 +7,7 @@ import { type } from "os";
 import React from "react";
 
 type SearchParams = {
-  category?: string | undefined;
+  category?: string | "";
   endcursor: string;
 };
 type ProjectSearch = {
