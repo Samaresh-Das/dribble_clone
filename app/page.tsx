@@ -1,10 +1,15 @@
 import { ProjectInterface } from "@/common.types";
 import Categories from "@/components/Categories";
+import LoadMore from "@/components/LoadMore";
 import ProjectCard from "@/components/ProjectCard";
 import { fetchAllProjects } from "@/lib/actions";
 import { type } from "os";
 import React from "react";
 
+type SearchParams = {
+  category?: string;
+  endcursor: string;
+};
 type ProjectSearch = {
   projectSearch: {
     edges: { node: ProjectInterface }[];
@@ -17,16 +22,17 @@ type ProjectSearch = {
   };
 };
 
-type SearchParams = {
-  category?: string;
-};
-
 type Props = {
   searchParams: SearchParams;
 };
 
-const Home = async ({ searchParams: { category } }: Props) => {
-  const data = (await fetchAllProjects(category)) as ProjectSearch;
+//setting directives for pagination
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+export const revalidate = 0;
+
+const Home = async ({ searchParams: { category, endcursor } }: Props) => {
+  const data = (await fetchAllProjects(category, endcursor)) as ProjectSearch;
 
   const projectsToDisplay = data?.projectSearch?.edges || [];
 
@@ -41,8 +47,10 @@ const Home = async ({ searchParams: { category } }: Props) => {
     );
   }
 
+  const pagination = data?.projectSearch?.pageInfo;
+
   return (
-    <section className="flex-start flex-col paddings mb-16">
+    <section className="flexStart flex-col paddings mb-16">
       <Categories />
       <section className="projects-grid">
         {projectsToDisplay.map(({ node }: { node: ProjectInterface }) => (
@@ -57,7 +65,12 @@ const Home = async ({ searchParams: { category } }: Props) => {
           />
         ))}
       </section>
-      <h1>LoadMore</h1>
+      <LoadMore
+        startCursor={pagination.startCursor}
+        endCursor={pagination.endCursor}
+        hasPreviousPage={pagination.hasPreviousPage}
+        hasNextPage={pagination.hasNextPage}
+      />
     </section>
   );
 };
