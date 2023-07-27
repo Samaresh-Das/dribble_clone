@@ -7,6 +7,7 @@ import {
   getProjectsOfUserQuery,
   getUserQuery,
   projectsQuery,
+  projectsQueryAll,
   updateProjectMutation,
 } from "@/graphql";
 import { GraphQLClient } from "graphql-request";
@@ -97,13 +98,17 @@ export const createNewProject = async (
 };
 
 export const fetchAllProjects = async (
-  category?: string,
-  endCursor?: string
+  category?: string | null,
+  endCursor?: string | null
 ) => {
   console.log(category);
   client.setHeader("x-api-key", apiKey);
 
+  // if (category) {
   return makeGraphQLRequest(projectsQuery, { category, endCursor });
+  // }
+
+  // return makeGraphQLRequest(projectsQueryAll, { endCursor });
 };
 
 export const getProjectDetails = (id: string) => {
